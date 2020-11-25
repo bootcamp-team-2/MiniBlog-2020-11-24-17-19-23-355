@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Components.Server;
 using MiniBlog.Model;
 
@@ -8,17 +9,7 @@ namespace MiniBlog.Stores
     public interface IUserStore
     {
         public List<User> Users { get; }
-    }
-
-    public class TestUserStore : IUserStore
-    {
-        public List<User> Users 
-        {
-            get
-            {
-                throw new Exception();
-            }
-        }
+        public User FindUserByName(string name);
     }
 
     public class UserStore : IUserStore
@@ -30,6 +21,8 @@ namespace MiniBlog.Stores
                 return UserStoreWillReplaceInFuture.Users;
             }
         }
+
+        public User FindUserByName(string name) => Users.FirstOrDefault(user => user.Name.ToLower() == name.ToLower());
     }
 
     public class UserStoreWillReplaceInFuture

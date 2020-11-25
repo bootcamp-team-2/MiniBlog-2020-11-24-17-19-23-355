@@ -23,7 +23,7 @@ namespace MiniBlog.Controllers
         [HttpPost]
         public ActionResult<User> Register(User user)
         {
-            if (!userStore.Users.Exists(_ => user.Name.ToLower() == _.Name.ToLower()))
+            if (userStore.FindUserByName(user.Name) == null)
             {
                 userStore.Users.Add(user);
             }
@@ -40,7 +40,7 @@ namespace MiniBlog.Controllers
         [HttpPut]
         public User Update(User user)
         {
-            var foundUser = userStore.Users.FirstOrDefault(_ => _.Name == user.Name);
+            var foundUser = userStore.FindUserByName(user.Name);
             if (foundUser != null)
             {
                 foundUser.Email = user.Email;
@@ -52,7 +52,7 @@ namespace MiniBlog.Controllers
         [HttpDelete]
         public User Delete(string name)
         {
-            var foundUser = userStore.Users.FirstOrDefault(_ => _.Name == name);
+            var foundUser = userStore.FindUserByName(name);
             if (foundUser != null)
             {
                 userStore.Users.Remove(foundUser);
@@ -65,7 +65,7 @@ namespace MiniBlog.Controllers
         [HttpGet("{name}")]
         public User GetByName(string name)
         {
-            return userStore.Users.FirstOrDefault(_ => _.Name.ToLower() == name.ToLower());
+            return userStore.FindUserByName(name);
         }
     }
 }
