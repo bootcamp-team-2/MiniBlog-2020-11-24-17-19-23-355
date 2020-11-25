@@ -51,7 +51,7 @@ namespace MiniBlog.Services
 
         public void UserRemove(User user)
         {
-            userStore.Users.Remove(FindUserName(user));
+            userStore.Users.Remove(user);
         }
     }
 }

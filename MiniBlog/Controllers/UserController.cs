@@ -45,8 +45,8 @@ namespace MiniBlog.Controllers
             var foundUser = userService.FindUserName(name);
             if (foundUser != null)
             {
-                UserStoreWillReplaceInFuture.Users.Remove(foundUser);
-                ArticleStoreWillReplaceInFuture.Articles.RemoveAll(a => a.UserName == foundUser.Name);
+                userService.UserRemove(foundUser);
+                ArticleStoreWillReplaceInFuture.Articles.RemoveAll(a => a.UserName == name);
             }
 
             return foundUser;
