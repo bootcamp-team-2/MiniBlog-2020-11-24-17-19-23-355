@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MiniBlog.Model;
@@ -13,14 +14,21 @@ namespace MiniBlog.Controllers
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
+        private readonly IArticleStore articleStore;
+
+        public ArticleController(IArticleStore articleStore)
+        {
+            this.articleStore = articleStore;
+        }
+
         [HttpGet]
         public List<Article> List()
         {
-            return ArticleStoreWillReplaceInFuture.Articles.ToList();
+            return articleStore.Articles.ToList();
         }
 
         [HttpPost]
-        public Article Create(Article article)
+        public async Task<ActionResult<Article>> Create(Article article)
         {
             if (article.UserName != null)
             {
@@ -29,16 +37,16 @@ namespace MiniBlog.Controllers
                     UserStoreWillReplaceInFuture.Users.Add(new User(article.UserName));
                 }
 
-                ArticleStoreWillReplaceInFuture.Articles.Add(article);
+                articleStore.Articles.Add(article);
             }
 
-            return article;
+            return CreatedAtAction(nameof(GetById), new { id = article.Id }, article);
         }
 
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
-            var foundArticle = ArticleStoreWillReplaceInFuture.Articles.FirstOrDefault(article => article.Id == id);
+            var foundArticle = articleStore.Articles.FirstOrDefault(article => article.Id == id);
             return foundArticle;
         }
     }
