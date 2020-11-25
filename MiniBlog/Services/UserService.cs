@@ -15,6 +15,16 @@ namespace MiniBlog.Services
             this.userStore = userStore;
         }
 
+        public User FindUserName(User user)
+        {
+            return userStore.Users.FirstOrDefault(_ => _.Name == user.Name);
+        }
+
+        public User FindUserName(string name)
+        {
+            return userStore.Users.FirstOrDefault(_ => _.Name.ToLower() == name.ToLower());
+        }
+
         public void UserRegister(User user)
         {
             if (!userStore.Users.Exists(_ => user.Name.ToLower() == _.Name.ToLower()))
@@ -30,13 +40,18 @@ namespace MiniBlog.Services
 
         public User UserUpdate(User user)
         {
-            var foundUser = userStore.Users.FirstOrDefault(_ => _.Name == user.Name);
+            var foundUser = FindUserName(user);
             if (foundUser != null)
             {
                 foundUser.Email = user.Email;
             }
 
             return foundUser;
+        }
+
+        public void UserRemove(User user)
+        {
+            userStore.Users.Remove(FindUserName(user));
         }
     }
 }
