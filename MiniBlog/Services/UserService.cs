@@ -10,9 +10,11 @@ namespace MiniBlog.Services
     public class UserService
     {
         private readonly IUserStore userStore;
-        public UserService(IUserStore userStore)
+        private readonly IArticleStore articleStore;
+        public UserService(IUserStore userStore, IArticleStore articleStore)
         {
             this.userStore = userStore;
+            this.articleStore = articleStore;
         }
 
         public User FindUserName(User user)
@@ -52,6 +54,18 @@ namespace MiniBlog.Services
         public User UserGetByName(string name)
         {
             return userStore.Users.FirstOrDefault(_ => _.Name.ToLower() == name.ToLower());
+        }
+
+        public User DeleteUserAndAticles(string name)
+        {
+            var foundUser = UserGetByName(name);
+            if (foundUser != null)
+            {
+                userStore.Users.Remove(foundUser);
+                articleStore.Articles.RemoveAll(a => a.UserName == name);
+            }
+
+            return foundUser;
         }
     }
 }
