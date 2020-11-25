@@ -53,5 +53,10 @@ namespace MiniBlog.Services
         {
             userStore.Users.Remove(user);
         }
+
+        public User UserGetByName(string name)
+        {
+            return userStore.Users.FirstOrDefault(_ => _.Name.ToLower() == name.ToLower());
+        }
     }
 }
