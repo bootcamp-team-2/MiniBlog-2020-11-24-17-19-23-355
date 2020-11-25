@@ -15,10 +15,12 @@ namespace MiniBlog.Controllers
     public class ArticleController : ControllerBase
     {
         private readonly IArticleStore articleStore;
+        private readonly IUserStore userStore;
 
-        public ArticleController(IArticleStore articleStore)
+        public ArticleController(IArticleStore articleStore, IUserStore userStore)
         {
             this.articleStore = articleStore;
+            this.userStore = userStore;
         }
 
         [HttpGet]
@@ -32,9 +34,9 @@ namespace MiniBlog.Controllers
         {
             if (article.UserName != null)
             {
-                if (!UserStoreWillReplaceInFuture.Users.Exists(_ => article.UserName == _.Name))
+                if (!userStore.Users.Exists(_ => article.UserName == _.Name))
                 {
-                    UserStoreWillReplaceInFuture.Users.Add(new User(article.UserName));
+                    userStore.Users.Add(new User(article.UserName));
                 }
 
                 articleStore.Articles.Add(article);
