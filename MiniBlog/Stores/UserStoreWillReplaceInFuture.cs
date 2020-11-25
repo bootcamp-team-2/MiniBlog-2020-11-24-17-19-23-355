@@ -9,20 +9,14 @@ namespace MiniBlog.Stores
     public interface IUserStore
     {
         public List<User> Users { get; }
-        public User FindUserByName(string name);
     }
 
     public class UserStore : IUserStore
     {
         public List<User> Users
         {
-            get
-            {
-                return UserStoreWillReplaceInFuture.Users;
-            }
+            get { return UserStoreWillReplaceInFuture.Users; }
         }
-
-        public User FindUserByName(string name) => Users.FirstOrDefault(user => user.Name.ToLower() == name.ToLower());
     }
 
     public class UserStoreWillReplaceInFuture

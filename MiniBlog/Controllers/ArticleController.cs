@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MiniBlog.Model;
+using MiniBlog.Services;
 using MiniBlog.Stores;
 
 namespace MiniBlog.Controllers
@@ -14,19 +15,19 @@ namespace MiniBlog.Controllers
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
-        private readonly IArticleStore articleStore;
-        private readonly IUserStore userStore;
+        private readonly UserService userService;
+        private readonly ArticleService articleService;
 
-        public ArticleController(IArticleStore articleStore, IUserStore userStore)
+        public ArticleController(UserService userService, ArticleService articleService)
         {
-            this.articleStore = articleStore;
-            this.userStore = userStore;
+            this.userService = userService;
+            this.articleService = articleService;
         }
 
         [HttpGet]
         public List<Article> List()
         {
-            return articleStore.Articles.ToList();
+            return articleService.GetAllArticles();
         }
 
         [HttpPost]
@@ -34,12 +35,8 @@ namespace MiniBlog.Controllers
         {
             if (article.UserName != null)
             {
-                if (userStore.FindUserByName(article.UserName) == null)
-                {
-                    userStore.Users.Add(new User(article.UserName));
-                }
-
-                articleStore.Articles.Add(article);
+                userService.RegisterUser(article.UserName);
+                articleService.AddArticle(article);
             }
 
             return CreatedAtAction(nameof(GetById), new { id = article.Id }, article);
@@ -48,8 +45,7 @@ namespace MiniBlog.Controllers
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
-            var foundArticle = articleStore.Articles.FirstOrDefault(article => article.Id == id);
-            return foundArticle;
+            return articleService.FindArticleById(id);
         }
     }
 }
