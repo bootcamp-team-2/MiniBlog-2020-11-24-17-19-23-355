@@ -30,19 +30,13 @@ namespace MiniBlog.Controllers
         [HttpGet]
         public List<User> GetAll()
         {
-            return UserStoreWillReplaceInFuture.Users;
+            return userService.UserGetAll();
         }
 
         [HttpPut]
         public User Update(User user)
         {
-            var foundUser = UserStoreWillReplaceInFuture.Users.FirstOrDefault(_ => _.Name == user.Name);
-            if (foundUser != null)
-            {
-                foundUser.Email = user.Email;
-            }
-
-            return foundUser;
+            return userService.UserUpdate(user);
         }
 
         [HttpDelete]
