@@ -13,6 +13,13 @@ namespace MiniBlog.Controllers
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
+        private readonly IArticalStore articalStore;
+
+        public ArticleController(IArticalStore articalStore)
+        {
+            this.articalStore = articalStore;
+        }
+
         [HttpGet]
         public List<Article> List()
         {
@@ -20,7 +27,7 @@ namespace MiniBlog.Controllers
         }
 
         [HttpPost]
-        public Article Create(Article article)
+        public async Task<ActionResult<Article>> Create(Article article)
         {
             if (article.UserName != null)
             {
@@ -29,16 +36,19 @@ namespace MiniBlog.Controllers
                     UserStoreWillReplaceInFuture.Users.Add(new User(article.UserName));
                 }
 
-                ArticleStoreWillReplaceInFuture.Articles.Add(article);
+                articalStore.Articles.Add(article);
             }
 
-            return article;
+            //IArticalStore articalStore = new ArticalStore();
+            //articalStore.Articles.Add(article);
+
+            return CreatedAtAction(nameof(GetById), new { id= article.Id }, article);
         }
 
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
-            var foundArticle = ArticleStoreWillReplaceInFuture.Articles.FirstOrDefault(article => article.Id == id);
+            var foundArticle = articalStore.Articles.FirstOrDefault(article => article.Id == id);
             return foundArticle;
         }
     }
