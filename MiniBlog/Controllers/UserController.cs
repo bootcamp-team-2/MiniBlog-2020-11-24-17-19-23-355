@@ -42,7 +42,7 @@ namespace MiniBlog.Controllers
         [HttpDelete]
         public User Delete(string name)
         {
-            var foundUser = userService.FindUserName(name);
+            var foundUser = userService.UserGetByName(name);
             if (foundUser != null)
             {
                 userService.UserRemove(foundUser);

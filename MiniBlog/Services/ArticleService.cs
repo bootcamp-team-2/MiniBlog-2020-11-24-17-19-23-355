@@ -19,15 +19,14 @@ namespace MiniBlog.Services
 
         public void ArticleAdd(Article article)
         {
-            if (article.UserName != null)
             {
                 if (!userStore.Users.Exists(_ => article.UserName == _.Name))
                 {
                     userStore.Users.Add(new User(article.UserName));
                 }
-
-                articleStore.Articles.Add(article);
             }
+
+            articleStore.Articles.Add(article);
         }
 
         public List<Article> GetAll()

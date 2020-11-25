@@ -20,11 +20,6 @@ namespace MiniBlog.Services
             return userStore.Users.FirstOrDefault(_ => _.Name == user.Name);
         }
 
-        public User FindUserName(string name)
-        {
-            return userStore.Users.FirstOrDefault(_ => _.Name.ToLower() == name.ToLower());
-        }
-
         public void UserRegister(User user)
         {
             if (!userStore.Users.Exists(_ => user.Name.ToLower() == _.Name.ToLower()))
