@@ -10,17 +10,6 @@ namespace MiniBlog.Stores
         public List<User> Users { get; } 
     }
 
-    public class TestUserStore : IUserStore
-    {
-        public List<User> Users
-        {
-            get
-            {
-                throw new Exception();
-            }
-        }
-    }
-
     public class UserStore : IUserStore
     {
         public List<User> Users

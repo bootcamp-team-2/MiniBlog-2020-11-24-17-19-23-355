@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MiniBlog;
 using MiniBlog.Model;
 using MiniBlog.Stores;
+using Moq;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -64,11 +65,14 @@ namespace MiniBlogTest.ControllerTest
         [Fact]
         public async Task Should_register_user_fail_when_UserStore_unavailable()
         {
+            Mock<IUserStore> mockUserStore = new Mock<IUserStore>();
+            mockUserStore.Setup(mock => mock.Users).Throws<Exception>();
+
             var client = Factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureServices(services =>
                 {
-                    services.AddScoped<IUserStore, TestUserStore>((serviceProvider) => { return new TestUserStore(); });
+                    services.AddScoped<IUserStore>((serviceProvider) => { return mockUserStore.Object; });
                 });
             }).CreateClient();
 
