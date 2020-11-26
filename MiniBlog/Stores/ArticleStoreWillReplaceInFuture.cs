@@ -17,17 +17,6 @@ namespace MiniBlog.Stores
         }
     }
 
-    public class ArticalStoreTest : IArticalStore
-    {
-        public List<Article> Articles
-        {
-            get
-            {
-                throw new Exception();
-            }
-        }
-    }
-
     public class ArticleStoreWillReplaceInFuture
     {
         static ArticleStoreWillReplaceInFuture()

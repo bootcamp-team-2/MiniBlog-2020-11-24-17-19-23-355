@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
@@ -6,10 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using MiniBlog;
 using MiniBlog.Model;
 using MiniBlog.Stores;
+using Moq;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -39,12 +42,15 @@ namespace MiniBlogTest.ControllerTest
         [Fact]
         public async Task Should_create_article_fail_when_ArticleStore_unavailable()
         {
+            Mock<IArticalStore> mockArticleStore = new Mock<IArticalStore>();
+            mockArticleStore.Setup(mock => mock.Articles).Throws<Exception>();
+
             var client = Factory.WithWebHostBuilder(builder =>
             {
-                builder.ConfigureServices(service => service.AddSingleton<IArticalStore, ArticalStoreTest>(
+                builder.ConfigureServices(service => service.AddSingleton<IArticalStore>(
                     serviceProvider =>
                     {
-                        return new ArticalStoreTest();
+                        return mockArticleStore.Object;
                     }));
             }).CreateClient();
 
