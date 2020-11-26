@@ -1,12 +1,37 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Components.Server;
 using MiniBlog.Model;
 
 namespace MiniBlog.Stores
 {
+    public interface IUsersStore
+    {
+        List<User> Users { get; }
+    }
+
+    public class UsersStore : IUsersStore
+    {
+        public List<User> Users
+        {
+            get { return UserStoreWillReplaceInFuture.Users; }
+        }
+    }
+
+    public class UsersStoreTest : IUsersStore
+    {
+        public List<User> Users
+        {
+            get
+            {
+                throw new Exception();
+            }
+        }
+    }
+
     public class UserStoreWillReplaceInFuture
     {
-        public UserStoreWillReplaceInFuture()
+        static UserStoreWillReplaceInFuture()
         {
             Users = new List<User>();
         }
