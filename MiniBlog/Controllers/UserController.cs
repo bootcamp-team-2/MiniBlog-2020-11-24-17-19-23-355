@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using MiniBlog.Model;
+using MiniBlog.Services;
 using MiniBlog.Stores;
 
 namespace MiniBlog.Controllers
@@ -11,43 +12,45 @@ namespace MiniBlog.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        [HttpPost]
-        public User Register(User user)
-        {
-            if (!UserStoreWillReplaceInFuture.Users.Exists(_ => user.Name.ToLower() == _.Name.ToLower()))
-            {
-                UserStoreWillReplaceInFuture.Users.Add(user);
-            }
+        private readonly UserService userService;
+        private readonly ArticleService articleService;
 
-            return user;
+        public UserController(UserService userService, ArticleService articleService)
+        {
+            this.userService = userService;
+            this.articleService = articleService;
+        }
+
+        [HttpPost]
+        public ActionResult<User> Register(User user)
+        {
+            userService.RegisterUser(user.Name, user.Email);
+
+            return CreatedAtAction(nameof(GetByName), new { name = user.Name }, user);
         }
 
         [HttpGet]
         public List<User> GetAll()
         {
-            return UserStoreWillReplaceInFuture.Users;
+            return userService.GetAllUsers();
         }
 
         [HttpPut]
         public User Update(User user)
         {
-            var foundUser = UserStoreWillReplaceInFuture.Users.FirstOrDefault(_ => _.Name == user.Name);
-            if (foundUser != null)
-            {
-                foundUser.Email = user.Email;
-            }
-
-            return foundUser;
+            var updatedUser = userService.UpdateUser(user);
+            return updatedUser;
         }
 
         [HttpDelete]
         public User Delete(string name)
         {
-            var foundUser = UserStoreWillReplaceInFuture.Users.FirstOrDefault(_ => _.Name == name);
+            var foundUser = userService.FindUserByName(name);
+
             if (foundUser != null)
             {
-                UserStoreWillReplaceInFuture.Users.Remove(foundUser);
-                ArticleStoreWillReplaceInFuture.Articles.RemoveAll(a => a.UserName == foundUser.Name);
+                userService.RemoveUser(foundUser);
+                articleService.RemoveAllArticlesOfUser(foundUser);
             }
 
             return foundUser;
@@ -56,7 +59,7 @@ namespace MiniBlog.Controllers
         [HttpGet("{name}")]
         public User GetByName(string name)
         {
-            return UserStoreWillReplaceInFuture.Users.FirstOrDefault(_ => _.Name.ToLower() == name.ToLower());
+            return userService.FindUserByName(name);
         }
     }
 }

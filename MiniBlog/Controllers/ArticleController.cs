@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MiniBlog.Model;
+using MiniBlog.Services;
 using MiniBlog.Stores;
 
 namespace MiniBlog.Controllers
@@ -13,33 +15,37 @@ namespace MiniBlog.Controllers
     [Route("[controller]")]
     public class ArticleController : ControllerBase
     {
+        private readonly UserService userService;
+        private readonly ArticleService articleService;
+
+        public ArticleController(UserService userService, ArticleService articleService)
+        {
+            this.userService = userService;
+            this.articleService = articleService;
+        }
+
         [HttpGet]
         public List<Article> List()
         {
-            return ArticleStoreWillReplaceInFuture.Articles.ToList();
+            return articleService.GetAllArticles();
         }
 
         [HttpPost]
-        public Article Create(Article article)
+        public async Task<ActionResult<Article>> Create(Article article)
         {
             if (article.UserName != null)
             {
-                if (!UserStoreWillReplaceInFuture.Users.Exists(_ => article.UserName == _.Name))
-                {
-                    UserStoreWillReplaceInFuture.Users.Add(new User(article.UserName));
-                }
-
-                ArticleStoreWillReplaceInFuture.Articles.Add(article);
+                userService.RegisterUser(article.UserName);
+                articleService.AddArticle(article);
             }
 
-            return article;
+            return CreatedAtAction(nameof(GetById), new { id = article.Id }, article);
         }
 
         [HttpGet("{id}")]
         public Article GetById(Guid id)
         {
-            var foundArticle = ArticleStoreWillReplaceInFuture.Articles.FirstOrDefault(article => article.Id == id);
-            return foundArticle;
+            return articleService.FindArticleById(id);
         }
     }
 }
